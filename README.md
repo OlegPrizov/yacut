@@ -1,7 +1,25 @@
+## Проект YaCut — это сервис укорачивания ссылок. Его назначение — ассоциировать длинную пользовательскую ссылку с короткой, которую предлагает сам пользователь или предоставляет сервис.
+
+Технологический стек:
+1. Python
+2. Flask
+3. SQLAlchemy
+
+## Как заполнить .env файл
+
+```
+FLASK_APP=yacut
+FLASK_ENV=development
+DATABASE_URI=sqlite:///db.sqlite3
+SECRET_KEY=YOUR_SECRET_KEY 
+```
+
+## Как запустить проект
+
 Клонировать репозиторий и перейти в него в командной строке:
 
 ```
-git clone 
+git clone git@github.com:OlegPrizov/yacut.git
 ```
 
 ```
@@ -35,3 +53,7 @@ python3 -m pip install --upgrade pip
 ```
 pip install -r requirements.txt
 ```
+
+## Об авторе:
+
+[Олег Призов](https://github.com/OlegPrizov)
