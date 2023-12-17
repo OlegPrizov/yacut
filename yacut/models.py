@@ -1,16 +1,16 @@
 from datetime import datetime
 from random import choices
 
-from re import match
 from flask import url_for
 from wtforms import ValidationError
+
 from . import db, SHORT_LINK_FUNCTION
 from .constants import (
     ALLOWED_SYMBOLS,
+    CUSTOM_LINK_PATTERN,
     MAX_AUTOGENERATE_CUSTOM_LINK_LENGTH,
     MAX_CUSTOM_LINK_LENGTH,
     MAX_ORIGINAL_LINK_LENGTH,
-    PATTERN,
     MAX_ITERATIONS
 )
 
@@ -26,10 +26,10 @@ class URLMap(db.Model):
     timestamp = db.Column(db.DateTime, index=True, default=datetime.utcnow)
 
     @staticmethod
-    def is_short_link_exists(custom_id):
-        return bool(
-            URLMap.query.filter_by(short=custom_id).first()
-        )
+    def is_short_link_exists(custom_id: str, get_404=False):
+        if get_404:
+            return URLMap.query.filter_by(short=custom_id).first_or_404()
+        return URLMap.query.filter_by(short=custom_id).first()
 
     def to_dict(self):
         return dict(
@@ -39,14 +39,13 @@ class URLMap(db.Model):
             )
         )
 
-    def from_dict(self, data):
-        setattr(self, 'original', data['url'])
-        setattr(self, 'short', data['custom_id'])
-
     @staticmethod
     def get_unique_short_id():
         for _ in range(MAX_ITERATIONS):
-            result_short_id = ''.join(choices(ALLOWED_SYMBOLS, k=MAX_AUTOGENERATE_CUSTOM_LINK_LENGTH))
+            result_short_id = ''.join(choices(
+                ALLOWED_SYMBOLS,
+                k=MAX_AUTOGENERATE_CUSTOM_LINK_LENGTH
+            ))
             if not URLMap.is_short_link_exists(result_short_id):
                 return result_short_id
         raise ValueError(ERROR_MESSAGE)
@@ -54,23 +53,22 @@ class URLMap(db.Model):
     @staticmethod
     def is_valid_short_id(short_id):
         if len(short_id) > MAX_CUSTOM_LINK_LENGTH:
-            return False
-        if not match(PATTERN, short_id):
-            return False
-        return True
+            raise ValidationError
+        if not CUSTOM_LINK_PATTERN.match(short_id):
+            raise ValidationError
+        return short_id
 
     @staticmethod
-    def get_original_url(short_id):
-        return URLMap.query.filter_by(short=short_id).first()
-
-    @staticmethod
-    def save(url, short):
+    def create(url: str, short: str, validate: bool):
         if not short:
             short = URLMap.get_unique_short_id()
-        if URLMap.is_short_link_exists(short):
+        elif URLMap.is_short_link_exists(short):
             raise ValidationError(SHORT_LINK_EXISTS_MESSAGE)
-        if not URLMap.is_valid_short_id(short):
-            raise ValidationError(INVALID_SHORT_ID_MESSAGE)
+        if validate:
+            try:
+                URLMap.is_valid_short_id(short) == short
+            except ValidationError:
+                raise ValidationError(INVALID_SHORT_ID_MESSAGE)
         new_data = URLMap(original=url, short=short)
         db.session.add(new_data)
         db.session.commit()

@@ -40,7 +40,7 @@
           </div>
           <div class="col-sm">
             <p class="text-center">
-              {% with  messages = get_flashed_messages(category_filter=["rejected"]) %}
+              {% with  messages = get_flashed_messages() %}
                 {% for message in messages %}
                   {{ message }}
                 {% endfor %}

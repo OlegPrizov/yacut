@@ -14,7 +14,7 @@ NO_URL_MESSAGE = '"url" является обязательным полем!'
 
 @app.route('/api/id/<string:short_id>/', methods=('GET',))
 def get_short_url(short_id):
-    url_map = URLMap.get_original_url(short_id)
+    url_map = URLMap.is_short_link_exists(short_id)
     if url_map is not None:
         return jsonify({'url': url_map.original}), HTTPStatus.OK
     raise InvalidAPIUsage(ID_NOT_FOUND_MESSAGE, HTTPStatus.NOT_FOUND)
@@ -28,9 +28,11 @@ def add_short_url():
     if 'url' not in data:
         raise InvalidAPIUsage(NO_URL_MESSAGE)
     try:
-        url = data.get('url')
-        custom_id = data.get('custom_id')
-        data = URLMap.save(url, custom_id)
-        return jsonify(data.to_dict()), HTTPStatus.CREATED
+        return jsonify(
+            URLMap.create(
+                data.get('url'),
+                data.get('custom_id'),
+                validate=True
+            ).to_dict()), HTTPStatus.CREATED
     except (ValidationError, ValueError) as error:
         raise InvalidAPIUsage(str(error))
