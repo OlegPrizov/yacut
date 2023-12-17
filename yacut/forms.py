@@ -13,6 +13,7 @@ CUSTOM_LINK_NAME = 'Ваш вариант короткой ссылки'
 REQUIRED_DATA_MESSAGE = 'Обязательное поле'
 SUBMIT_MESSAGE = 'Создать'
 
+
 class UrlForm(FlaskForm):
     original_link = StringField(
         ORIGINAL_LINK_NAME,
