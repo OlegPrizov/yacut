@@ -17,19 +17,15 @@
               {{ form.csrf_token }}
               {{ form.original_link(class="form-control form-control-lg py-2 mb-3", placeholder=form.original_link.label.text) }}
               <p>
-                {% if form.original_link.errors %}
-                  {% for error in errors %}
-                    <span style="color:red">{{ error }}</span>
-                  {% endfor %}
-                {% endif %}
+                {% for error in errors %}
+                  <span style="color:red">{{ error }}</span>
+                {% endfor %}
               </p>
               {{ form.custom_id(class="form-control form-control-lg py-2 mb-3", placeholder=form.custom_id.label.text) }}
               <p>
-                {% if form.custom_id.errors %}
-                  {% for error in errors %}
-                    <span style="color:red">{{ error }}</span>
-                  {% endfor %}
-                {% endif %}
+                {% for error in errors %}
+                  <span style="color:red">{{ error }}</span>
+                {% endfor %}
               </p>
               {{ form.submit(class="btn btn-primary")}}
             </form>
@@ -45,25 +41,18 @@
           <div class="col-sm">
             <p class="text-center">
               {% with  messages = get_flashed_messages(category_filter=["rejected"]) %}
-                {% if messages %}
-                  {% for message in messages %}
-                    {{ message }}
-                  {% endfor %}
-                {% endif %}
+                {% for message in messages %}
+                  {{ message }}
+                {% endfor %}
               {% endwith %}
-
-              {% with  messages = get_flashed_messages(category_filter=["complete_link"]) %}
-                {% if messages %}
-                  <h5 class="text-center">
-                    Ваша новая ссылка готова:
-                  </h5>
-                  {% for message in messages %}
-                    <a href="{{ message }}">
-                      {{ message }}
-                    </a>
-                  {% endfor %}
-                {% endif %}
-              {% endwith %}
+              {% if url %}
+                <h5 class="text-center">
+                  Ваша новая ссылка готова:
+                  <a href="{{ url }}">
+                    {{ url }}
+                  </a>
+                </h5>
+              {% endif %}
             </p>
           </div>
           <div class="col-sm">
