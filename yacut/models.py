@@ -30,7 +30,7 @@ class URLMap(db.Model):
     timestamp = db.Column(db.DateTime, index=True, default=datetime.utcnow)
 
     @staticmethod
-    def get_url_map_by_short_link(short: str, get_404=False):
+    def get_url_map_by_short(short: str, get_404=False):
         if get_404:
             return URLMap.query.filter_by(short=short).first_or_404()
         return URLMap.query.filter_by(short=short).first()
@@ -50,12 +50,12 @@ class URLMap(db.Model):
                 ALLOWED_SYMBOLS,
                 k=MAX_AUTOGENERATE_SHORT_LENGTH
             ))
-            if not URLMap.get_url_map_by_short_link(short):
+            if not URLMap.get_url_map_by_short(short):
                 return short
         raise ValueError(ERROR_SHORT_GENERATE_MESSAGE)
 
     @staticmethod
-    def is_short_valid(short):
+    def is_short_valid(short: str):
         if len(short) > MAX_SHORT_LENGTH:
             raise ValidationError(INVALID_SHORT_MESSAGE)
         if not SHORT_PATTERN.match(short):
@@ -63,16 +63,13 @@ class URLMap(db.Model):
         return short
 
     @staticmethod
-    def create(url: str, short: str, validate: bool):
+    def create(url, short, validate: bool):
         if not short:
             short = URLMap.get_unique_short()
-        elif URLMap.get_url_map_by_short_link(short):
+        elif URLMap.get_url_map_by_short(short):
             raise ValidationError(SHORT_EXISTS_MESSAGE)
         if validate:
-            try:
-                URLMap.is_short_valid(short)
-            except ValidationError:
-                raise ValidationError(INVALID_SHORT_MESSAGE)
+            URLMap.is_short_valid(short)
         new_data = URLMap(original=url, short=short)
         db.session.add(new_data)
         db.session.commit()
