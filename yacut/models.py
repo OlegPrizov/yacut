@@ -16,17 +16,21 @@ from .constants import (
 
 SHORT_LINK_EXISTS_MESSAGE = 'Предложенный вариант короткой ссылки уже существует.'
 INVALID_SHORT_ID_MESSAGE = 'Указано недопустимое имя для короткой ссылки'
-ERROR_MESSAGE = 'Невозможно сгенерировать короткую ссылку'
+ERROR_LINK_GENERATE_MESSAGE = 'Невозможно сгенерировать короткую ссылку'
 
 
 class URLMap(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     original = db.Column(db.String(MAX_CUSTOM_LINK_LENGTH), nullable=False)
-    short = db.Column(db.String(MAX_ORIGINAL_LINK_LENGTH), unique=True, nullable=False)
+    short = db.Column(
+        db.String(MAX_ORIGINAL_LINK_LENGTH),
+        unique=True,
+        nullable=False
+    )
     timestamp = db.Column(db.DateTime, index=True, default=datetime.utcnow)
 
     @staticmethod
-    def is_short_link_exists(custom_id: str, get_404=False):
+    def get_url_map_by_short_link(custom_id: str, get_404=False):
         if get_404:
             return URLMap.query.filter_by(short=custom_id).first_or_404()
         return URLMap.query.filter_by(short=custom_id).first()
@@ -46,23 +50,23 @@ class URLMap(db.Model):
                 ALLOWED_SYMBOLS,
                 k=MAX_AUTOGENERATE_CUSTOM_LINK_LENGTH
             ))
-            if not URLMap.is_short_link_exists(result_short_id):
+            if not URLMap.get_url_map_by_short_link(result_short_id):
                 return result_short_id
-        raise ValueError(ERROR_MESSAGE)
+        raise ValueError(ERROR_LINK_GENERATE_MESSAGE)
 
     @staticmethod
     def is_valid_short_id(short_id):
         if len(short_id) > MAX_CUSTOM_LINK_LENGTH:
-            raise ValidationError
+            raise ValidationError(SHORT_LINK_EXISTS_MESSAGE)
         if not CUSTOM_LINK_PATTERN.match(short_id):
-            raise ValidationError
+            raise ValidationError(SHORT_LINK_EXISTS_MESSAGE)
         return short_id
 
     @staticmethod
     def create(url: str, short: str, validate: bool):
         if not short:
             short = URLMap.get_unique_short_id()
-        elif URLMap.is_short_link_exists(short):
+        elif URLMap.get_url_map_by_short_link(short):
             raise ValidationError(SHORT_LINK_EXISTS_MESSAGE)
         if validate:
             try:

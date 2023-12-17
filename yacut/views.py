@@ -31,5 +31,4 @@ def index_view():
 
 @app.route('/<string:short_id>', methods=('GET',))
 def short_link_url(short_id):
-    url_map = URLMap.is_short_link_exists(short_id, get_404=True)
-    return redirect(url_map.original)
+    return redirect(URLMap.get_url_map_by_short_link(short_id, get_404=True).original)

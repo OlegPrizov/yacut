@@ -11,7 +11,7 @@ from .constants import (
 ORIGINAL_LINK_NAME = 'Длинная ссылка'
 CUSTOM_LINK_NAME = 'Ваш вариант короткой ссылки'
 REQUIRED_DATA_MESSAGE = 'Обязательное поле'
-
+SUBMIT_MESSAGE = 'Создать'
 
 class UrlForm(FlaskForm):
     original_link = StringField(
@@ -29,4 +29,4 @@ class UrlForm(FlaskForm):
             Optional(),
         ]
     )
-    submit = SubmitField('Создать')
+    submit = SubmitField(SUBMIT_MESSAGE)

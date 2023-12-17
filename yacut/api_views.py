@@ -14,7 +14,7 @@ NO_URL_MESSAGE = '"url" является обязательным полем!'
 
 @app.route('/api/id/<string:short_id>/', methods=('GET',))
 def get_short_url(short_id):
-    url_map = URLMap.is_short_link_exists(short_id)
+    url_map = URLMap.get_url_map_by_short_link(short_id)
     if url_map is not None:
         return jsonify({'url': url_map.original}), HTTPStatus.OK
     raise InvalidAPIUsage(ID_NOT_FOUND_MESSAGE, HTTPStatus.NOT_FOUND)
