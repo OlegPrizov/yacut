@@ -2,6 +2,7 @@ import os
 
 SHORT_LINK_FUNCTION = 'short_link_url'
 
+
 class Config(object):
     SQLALCHEMY_DATABASE_URI = os.getenv(
         'DATABASE_URI', default='sqlite:///db.sqlite3')
