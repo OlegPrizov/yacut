@@ -12,9 +12,9 @@ NO_BODY_MESSAGE = 'Отсутствует тело запроса'
 NO_URL_MESSAGE = '"url" является обязательным полем!'
 
 
-@app.route('/api/id/<string:short_id>/', methods=('GET',))
-def get_short_url(short_id):
-    url_map = URLMap.get_url_map_by_short_link(short_id)
+@app.route('/api/id/<string:short>/', methods=('GET',))
+def get_short_url(short):
+    url_map = URLMap.get_url_map_by_short_link(short)
     if url_map is not None:
         return jsonify({'url': url_map.original}), HTTPStatus.OK
     raise InvalidAPIUsage(ID_NOT_FOUND_MESSAGE, HTTPStatus.NOT_FOUND)

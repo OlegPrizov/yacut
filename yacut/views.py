@@ -1,7 +1,7 @@
 from flask import flash, redirect, render_template, url_for
 from wtforms import ValidationError
 
-from . import app, SHORT_LINK_FUNCTION
+from . import app, SHORT_FUNCTION
 from .forms import UrlForm
 from .models import URLMap
 
@@ -16,8 +16,8 @@ def index_view():
             'index.html',
             form=form,
             url=url_for(
-                SHORT_LINK_FUNCTION,
-                short_id=URLMap.create(
+                SHORT_FUNCTION,
+                short=URLMap.create(
                     form.original_link.data,
                     form.custom_id.data,
                     validate=False
@@ -29,6 +29,6 @@ def index_view():
         return render_template('index.html', form=form)
 
 
-@app.route('/<string:short_id>', methods=('GET',))
-def short_link_url(short_id):
-    return redirect(URLMap.get_url_map_by_short_link(short_id, get_404=True).original)
+@app.route('/<string:short>', methods=('GET',))
+def short_link_url(short):
+    return redirect(URLMap.get_url_map_by_short_link(short, get_404=True).original)

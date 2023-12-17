@@ -1,6 +1,6 @@
 import os
 
-SHORT_LINK_FUNCTION = 'short_link_url'
+SHORT_FUNCTION = 'short_link_url'
 
 
 class Config(object):

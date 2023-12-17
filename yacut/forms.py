@@ -3,9 +3,9 @@ from wtforms import StringField, SubmitField
 from wtforms.validators import DataRequired, Length, Optional, Regexp
 
 from .constants import (
-    MAX_CUSTOM_LINK_LENGTH,
+    MAX_SHORT_LENGTH,
     MAX_ORIGINAL_LINK_LENGTH,
-    CUSTOM_LINK_PATTERN
+    SHORT_PATTERN
 )
 
 ORIGINAL_LINK_NAME = 'Длинная ссылка'
@@ -24,8 +24,8 @@ class UrlForm(FlaskForm):
     custom_id = StringField(
         CUSTOM_LINK_NAME,
         validators=[
-            Length(max=MAX_CUSTOM_LINK_LENGTH),
-            Regexp(CUSTOM_LINK_PATTERN),
+            Length(max=MAX_SHORT_LENGTH),
+            Regexp(SHORT_PATTERN),
             Optional(),
         ]
     )
