@@ -1,8 +1,10 @@
 from flask import flash, redirect, render_template, url_for
+from wtforms import ValidationError
 
-from . import app, db, SHORT_LINK_FUNCTION
+from . import app, SHORT_LINK_FUNCTION
 from .forms import UrlForm
 from .models import URLMap
+
 
 @app.route('/', methods=('GET', 'POST',))
 def index_view():
@@ -10,27 +12,24 @@ def index_view():
     url_to_template = None
 
     if not form.validate_on_submit():
-        return render_template('index.html', form=form, url=None)
+        return render_template('index.html', form=form)
 
-    url_map = URLMap()
-    custom_id = form.custom_id.data
-    if not custom_id:
-        custom_id = url_map.get_unique_short_id()
-    if URLMap.query.filter_by(short=custom_id).first():
-        flash('Предложенный вариант короткой ссылки уже существует.', 'rejected')
-    elif not url_map.is_valid_short_id(custom_id):
-        flash("Ваша короткая ссылка содержит недопустимые символы.", 'rejected')
-    else:
-        short_url = URLMap(
-            original=form.original_link.data,
-            short=custom_id
+    try:
+        url_to_template = url_for(
+            SHORT_LINK_FUNCTION,
+            short_id=URLMap.save(
+                form.original_link.data,
+                form.custom_id.data
+            ).short,
+            _external=True)
+        return render_template(
+            'index.html',
+            form=form,
+            url=url_to_template
         )
-        db.session.add(short_url)
-        db.session.commit()
-        url_to_template = url_for(SHORT_LINK_FUNCTION, short_id=custom_id, _external=True)
-
-    return render_template('index.html', form=form, url=url_to_template)
-
+    except (ValidationError, ValueError) as error:
+        flash(str(error), 'rejected')
+        return render_template('index.html', form=form)
 
 
 @app.route('/<string:short_id>', methods=('GET',))

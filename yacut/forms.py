@@ -11,6 +11,7 @@ from .constants import (
 ORIGINAL_LINK_NAME = 'Длинная ссылка'
 CUSTOM_LINK_NAME = 'Ваш вариант короткой ссылки'
 
+
 class UrlForm(FlaskForm):
     original_link = StringField(
         ORIGINAL_LINK_NAME,
